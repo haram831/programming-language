@@ -1,0 +1,17 @@
+# 컴파일 결과물
+*.o
+*.out
+*.exe
+*.class
+
+# build 폴더
+build/
+dist/
+
+# OCaml
+*.cmo
+*.cmi
+*.cmx
+*.o
+*.a
+*.cmxa
