@@ -1,8 +1,11 @@
 # 컴파일 결과물
+*.cmi
+*.cmo
+*.cmx
 *.o
-*.out
-*.exe
-*.class
+*.a
+*.cmxa
+*.cma
 
 # build 폴더
 build/
