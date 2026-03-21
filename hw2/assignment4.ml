@@ -15,8 +15,8 @@ let goLeft loc =
 let goRight loc =
   match loc with
   | LOC(t, TOP) -> raise (NOMOVE "right of top")
-  | LOC(t, HAND(left, up, r::right))-> LOC(r, HAND(t::left, up, right)) (*left::t의 형태가 아니어도 되나..?*)
-  | LOC(t, HAND(_, _, [])) -> raise (NOMOVE "right of first")
+  | LOC(t, HAND(left, up, r::right))-> LOC(r, HAND(t::left, up, right))
+  | LOC(t, HAND(_, _, [])) -> raise (NOMOVE "right of empty node")
 
 let goUp loc =
   match loc with
