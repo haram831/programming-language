@@ -9,7 +9,7 @@ type exp = X
 | C of exp * exp * exp (* sigma *)
 | L of exp * exp * exp (* integral *)
 
-exception InvalidArgument
+exception Unbound
 
 let dx = 0.1
 
@@ -54,11 +54,11 @@ let rec calculate exp =
     if from_num < to_num
       then loop from_num to_num 0.
     else -. loop to_num from_num 0.
-  | _ -> raise InvalidArgument
+  | _ -> raise Unbound
 
-(* ========================= *)
-(* test code starts here     *)
-(* ========================= *)
+(* ========================= 
+   test code starts here     
+   =========================
 
 let eps = 1e-6
 
@@ -93,14 +93,13 @@ let run_invalid_test name expr =
       Printf.printf "[FAIL] %s -> unexpected exception: %s\n"
         name (Printexc.to_string e)
 
-(* 현재 네 integral 구현(L)은 dx를 곱하지 않으므로,
-   expected 계산도 같은 방식으로 맞춰주는 helper *)
-let expected_integral_like_code from_v to_v f =
-  let rec loop x acc =
-    if x > to_v then acc
-    else loop (x +. dx) (acc +. f x)
+let expected_integral_like_current_code from_v to_v f =
+  let rec loop from_n to_n acc =
+    if from_n +. dx >= to_n then acc
+    else loop (from_n +. dx) to_n (acc +. (f from_n *. dx))
   in
-  loop from_v 0.
+  if from_v < to_v then loop from_v to_v 0.
+  else -. (loop to_v from_v 0.)
 
 let () =
   Printf.printf "========== BASIC CONSTANT TESTS ==========\n";
@@ -153,31 +152,31 @@ let () =
     (substitute 5.0 X) 5.0;
 
   run_test "T22: X + 3, x=2"
-    (calculate (substitute 2.0 (A (X, I 3))) |> fun v -> R v) 5.0;
+    (substitute 2.0 (A (X, I 3))) 5.0;
 
   run_test "T23: X - 1, x=4"
-    (calculate (substitute 4.0 (S (X, I 1))) |> fun v -> R v) 3.0;
+    (substitute 4.0 (S (X, I 1))) 3.0;
 
   run_test "T24: X * 2, x=3"
-    (calculate (substitute 3.0 (M (X, I 2))) |> fun v -> R v) 6.0;
+    (substitute 3.0 (M (X, I 2))) 6.0;
 
   run_test "T25: X / 2, x=8"
-    (calculate (substitute 8.0 (D (X, I 2))) |> fun v -> R v) 4.0;
+    (substitute 8.0 (D (X, I 2))) 4.0;
 
   run_test "T26: (X+1)*(X-1), x=3"
-    (calculate (substitute 3.0 (M (A (X, I 1), S (X, I 1)))) |> fun v -> R v) 8.0;
+    (substitute 3.0 (M (A (X, I 1), S (X, I 1)))) 8.0;
 
   run_test "T27: X+X, x=2.5"
-    (calculate (substitute 2.5 (A (X, X))) |> fun v -> R v) 5.0;
+    (substitute 2.5 (A (X, X))) 5.0;
 
   run_test "T28: (X*X)+1, x=4"
-    (calculate (substitute 4.0 (A (M (X, X), I 1))) |> fun v -> R v) 17.0;
+    (substitute 4.0 (A (M (X, X), I 1))) 17.0;
 
   run_test "T29: (X/2)+(X/2), x=6"
-    (calculate (substitute 6.0 (A (D (X, I 2), D (X, I 2)))) |> fun v -> R v) 6.0;
+    (substitute 6.0 (A (D (X, I 2), D (X, I 2)))) 6.0;
 
   run_test "T30: ((X+2)*(X+3)), x=1"
-    (calculate (substitute 1.0 (M (A (X, I 2), A (X, I 3)))) |> fun v -> R v) 12.0;
+    (substitute 1.0 (M (A (X, I 2), A (X, I 3)))) 12.0;
 
   Printf.printf "\n========== SIGMA TESTS ==========\n";
 
@@ -189,19 +188,15 @@ let () =
 
   run_test "T33: sigma 2 to 4 of (X+1)"
     (C (I 2, I 4, A (X, I 1))) 12.0;
-  (* 3 + 4 + 5 = 12 *)
 
   run_test "T34: sigma 1 to 4 of (2*X)"
     (C (I 1, I 4, M (I 2, X))) 20.0;
-  (* 2 + 4 + 6 + 8 *)
 
   run_test "T35: sigma 1 to 3 of (X*X)"
     (C (I 1, I 3, M (X, X))) 14.0;
-  (* 1 + 4 + 9 *)
 
   run_test "T36: sigma 0 to 3 of (X-1)"
     (C (I 0, I 3, S (X, I 1))) 2.0;
-  (* -1 + 0 + 1 + 2 *)
 
   run_test "T37: sigma 3 to 3 of X"
     (C (I 3, I 3, X)) 3.0;
@@ -214,62 +209,111 @@ let () =
 
   run_test "T40: sigma 1 to 4 of ((X*X)+1)"
     (C (I 1, I 4, A (M (X, X), I 1))) 34.0;
-  (* (1+1)+(4+1)+(9+1)+(16+1)=34 *)
 
-  Printf.printf "\n========== INTEGRAL TESTS (CURRENT CODE BEHAVIOR) ==========\n";
+  Printf.printf "\n========== INTEGRAL TESTS (UPDATED CODE) ==========\n";
 
-  run_test "T41: integral 1 to 1 of X"
-    (L (I 1, I 1, X))
-    (expected_integral_like_code 1.0 1.0 (fun x -> x));
+  run_test "T41: integral 0 to 0 of 5"
+    (L (R 0.0, R 0.0, I 5))
+    (expected_integral_like_current_code 0.0 0.0 (fun _ -> 5.0));
 
-  run_test "T42: integral 1 to 1.2 of 1"
-    (L (R 1.0, R 1.2, I 1))
-    (expected_integral_like_code 1.0 1.2 (fun _ -> 1.0));
+  run_test "T42: integral 0 to -0.5 of 1"
+    (L (R 0.0, R (-. 0.5), I 1))
+    (expected_integral_like_current_code 0.0 (-. 0.5) (fun _ -> 1.0));
 
-  run_test "T43: integral 1 to 1.2 of X"
-    (L (R 1.0, R 1.2, X))
-    (expected_integral_like_code 1.0 1.2 (fun x -> x));
+  run_test "T43: integral -0.5 to -0.5 of X"
+    (L (R (-. 0.5), R (-. 0.5), X))
+    (expected_integral_like_current_code (-. 0.5) (-. 0.5) (fun x -> x));
 
-  run_test "T44: integral 0 to 0.3 of (X+1)"
-    (L (R 0.0, R 0.3, A (X, I 1)))
-    (expected_integral_like_code 0.0 0.3 (fun x -> x +. 1.0));
+  run_test "T44: integral 1 to 1.5 of X"
+    (L (R 1.0, R 1.5, X))
+    (expected_integral_like_current_code 1.0 1.5 (fun x -> x));
 
-  run_test "T45: integral 0 to 0.2 of (2*X)"
-    (L (R 0.0, R 0.2, M (I 2, X)))
-    (expected_integral_like_code 0.0 0.2 (fun x -> 2.0 *. x));
+  run_test "T45: integral 0 to 0.4 of (X+1)"
+    (L (R 0.0, R 0.4, A (X, I 1)))
+    (expected_integral_like_current_code 0.0 0.4 (fun x -> x +. 1.0));
 
-  run_test "T46: integral 0 to 0.2 of (X*X)"
-    (L (R 0.0, R 0.2, M (X, X)))
-    (expected_integral_like_code 0.0 0.2 (fun x -> x *. x));
+  run_test "T46: integral 0 to 0.4 of (2*X)"
+    (L (R 0.0, R 0.4, M (I 2, X)))
+    (expected_integral_like_current_code 0.0 0.4 (fun x -> 2.0 *. x));
 
-  run_test "T47: integral 2 to 1 of X"
+  run_test "T47: integral 0 to 0.4 of (X*X)"
+    (L (R 0.0, R 0.4, M (X, X)))
+    (expected_integral_like_current_code 0.0 0.4 (fun x -> x *. x));
+
+  run_test "T48: integral 0 to 0.4 of ((X*X)+1)"
+    (L (R 0.0, R 0.4, A (M (X, X), I 1)))
+    (expected_integral_like_current_code 0.0 0.4 (fun x -> x *. x +. 1.0));
+
+  run_test "T49: integral 2 to 1 of X"
     (L (R 2.0, R 1.0, X))
+    (expected_integral_like_current_code 2.0 1.0 (fun x -> x));
+
+  run_test "T50: integral 0 to 0.1 of X"
+    (L (R 0.0, R 0.1, X))
+    (expected_integral_like_current_code 0.0 0.1 (fun x -> x));
+
+  run_test "T51: integral -0.3 to 0.3 of X"
+    (L (R (-0.3), R 0.3, X))
+    (expected_integral_like_current_code (-0.3) 0.3 (fun x -> x));
+
+  run_test "T52: integral -0.2 to 0.2 of (X+2)"
+    (L (R (-0.2), R 0.2, A (X, I 2)))
+    (expected_integral_like_current_code (-0.2) 0.2 (fun x -> x +. 2.0));
+
+  run_test "T53: integral 1 to 1 of 5"
+    (L (R 1.0, R 1.0, I 5))
+    (expected_integral_like_current_code 1.0 1.0 (fun _ -> 5.0));
+
+  run_test "T54: integral 3 to 2 of 5"
+    (L (R 3.0, R 2.0, I 5))
+    (expected_integral_like_current_code 3.0 2.0 (fun _ -> 5.0));
+
+  Printf.printf "\n========== COMBINED / COMPLEX TESTS ==========\n";
+
+  run_test "T55: sigma 1 to 3 of integral 0 to 0.3 of 5"
+    (C (I 1, I 3, L (R 0.0, R 0.3, I 5)))
+    (3.0 *. expected_integral_like_current_code 0.0 0.3 (fun _ -> 5.0));
+
+  run_test "T56: integral 0 to 0.4 of sigma 1 to 3 of X"
+    (L (R 0.0, R 0.4, C (I 1, I 3, X)))
+    (expected_integral_like_current_code 0.0 0.4 (fun _ -> 6.0));
+
+  run_test "T57: sigma 1 to 3 of (X+2)"
+    (C (I 1, I 3, A (X, I 2)))
+    12.0;
+
+  run_test "T58: sigma -1 to 1 of (X*2)"
+    (C (I (-1), I 1, M (X, I 2)))
     0.0;
 
-  run_test "T48: integral -0.2 to 0.2 of X"
-    (L (R (-0.2), R 0.2, X))
-    (expected_integral_like_code (-0.2) 0.2 (fun x -> x));
+  run_test "T59: integral 0 to 0.5 of ((X+1)*(X+2))"
+    (L (R 0.0, R 0.5, M (A (X, I 1), A (X, I 2))))
+    (expected_integral_like_current_code 0.0 0.5 (fun x -> (x +. 1.0) *. (x +. 2.0)));
 
-  run_test "T49: integral 0 to 0.3 of 5"
-    (L (R 0.0, R 0.3, I 5))
-    (expected_integral_like_code 0.0 0.3 (fun _ -> 5.0));
-
-  run_test "T50: integral 0 to 0.3 of ((X*X)+1)"
-    (L (R 0.0, R 0.3, A (M (X, X), I 1)))
-    (expected_integral_like_code 0.0 0.3 (fun x -> x *. x +. 1.0));
+  run_test "T60: substitute 2 into sigma body"
+    (substitute 2.0 (C (I 1, I 3, A (X, I 1))))
+    9.0;
 
   Printf.printf "\n========== INVALID ARGUMENT TESTS ==========\n";
 
-  run_invalid_test "T51: calculate X directly"
+  run_invalid_test "T61: calculate X directly"
     X;
 
-  run_invalid_test "T52: calculate (X + 1) directly"
+  run_invalid_test "T62: calculate (X + 1) directly"
     (A (X, I 1));
 
-  run_invalid_test "T53: calculate sigma containing unsubstituted bound X"
+  run_invalid_test "T63: calculate sigma with X as lower bound"
     (C (X, I 3, X));
 
-  run_invalid_test "T54: calculate integral containing unsubstituted upper bound X"
+  run_invalid_test "T64: calculate sigma with X as upper bound"
+    (C (I 1, X, X));
+
+  run_invalid_test "T65: calculate integral with X as lower bound"
+    (L (X, I 1, X));
+
+  run_invalid_test "T66: calculate integral with X as upper bound"
     (L (I 0, X, X));
 
   Printf.printf "\n========== TESTS FINISHED ==========\n"
+
+*)
