@@ -6,6 +6,8 @@ type ae = CONST of int
   | TIMES of ae list
   | SUM of ae list
 
+exception InvalidArgument
+
 let rec diff (ae, x) =
   match ae with
   | CONST c -> CONST 0
@@ -17,7 +19,10 @@ let rec diff (ae, x) =
     | 0 -> CONST 0
     | 1 -> CONST 1
     | _ -> TIMES [CONST (n); POWER (s, n-1)])
-  | SUM exps -> SUM (List.map (fun e -> diff (e, x)) exps)
+  | SUM exps ->
+    (match exps with
+    | [] -> raise InvalidArgument
+    | _ -> SUM (List.map (fun e -> diff (e, x)) exps))
   | TIMES exps -> 
       (*곱의 미분법*)
       let rec aux left right =
@@ -27,4 +32,6 @@ let rec diff (ae, x) =
           let term = TIMES (List.rev_append left (diff (hd, x) :: tl)) in
           term :: aux (hd :: left) tl
       in
-      SUM (aux [] exps)
+      (match exps with
+      | [] -> raise InvalidArgument
+      | _ -> SUM (aux [] exps))
