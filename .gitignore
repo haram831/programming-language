@@ -8,6 +8,9 @@
 *.cmxa
 *.cma
 
+# 제출용 zip 파일
+*.zip
+
 # build 폴더
 build/
 dist/
