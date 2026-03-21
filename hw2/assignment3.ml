@@ -31,4 +31,4 @@ let findMin h = match h with
 
 let deleteMin h = match h with
   | EMPTY -> raise EmptyHeap
-  | NODE(_,x,lh,rh) -> merge(lh,rh)
+  | NODE(_,_,lh,rh) -> merge(lh,rh)
