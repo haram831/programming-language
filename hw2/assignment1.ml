@@ -23,8 +23,8 @@ let rec substitute x exp =
   | S (e1, e2) -> S (substitute x e1, substitute x e2)
   | M (e1, e2) -> M (substitute x e1, substitute x e2)
   | D (e1, e2) -> D (substitute x e1, substitute x e2)
-  | C (e1, e2, e3) -> C (substitute x e1, substitute x e2, substitute x e3)
-  | L (e1, e2, e3) -> L (substitute x e1, substitute x e2, substitute x e3)
+  | C (e1, e2, e3) -> C (substitute x e1, substitute x e2, e3)
+  | L (e1, e2, e3) -> L (substitute x e1, substitute x e2, e3)
 
 let rec calculate exp =
   match exp with
@@ -55,3 +55,8 @@ let rec calculate exp =
       then loop from_num to_num 0.
     else -. loop to_num from_num 0.
   | _ -> raise Unbound
+
+(*
+C(I(3),I(5),M(L(M(X,I(2)),M(X,R(3.001)),S(M(X,I(2)),I(1))),X))
+3, 5, 곱하기[인테그랄 (2x, 3.001x, 2x-1), x]
+*)
