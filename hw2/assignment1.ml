@@ -57,6 +57,8 @@ let rec calculate exp =
   | _ -> raise Unbound
 
 (*
+C(I(1),I(5),M(X,C(S(M(X,X),X),M(X,X),M(X,I(2)))))
+|> test_approx 2128.
 C(I(3),I(5),M(L(M(X,I(2)),M(X,R(3.001)),S(M(X,I(2)),I(1))),X))
-3, 5, 곱하기[인테그랄 (2x, 3.001x, 2x-1), x]
+|> test_approx 1053.8
 *)
