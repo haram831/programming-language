@@ -198,7 +198,56 @@ module K : KMINUS = struct
         let v, mem' = eval mem env e in
         let l = lookup_env_loc env x in
         (v, Mem.store mem' l v)
-    | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
+    | VAR x ->
+        let l = lookup_env_loc env x in
+        (Mem.load mem l, mem)
+    | ADD (e1, e2) -> 
+      let v1 = eval mem env e1 in
+      let v2 = eval mem env e2 in
+      (Num (value_int (fst v1) + value_int (fst v2)), mem)
+    | SUB (e1, e2) ->
+      let v1 = eval mem env e1 in
+      let v2 = eval mem env e2 in
+      (Num (value_int (fst v1) - value_int (fst v2)), mem)
+    | MUL (e1, e2) ->
+      let v1 = eval mem env e1 in
+      let v2 = eval mem env e2 in
+      (Num (value_int (fst v1) * value_int (fst v2)), mem)
+    | DIV (e1, e2) ->
+      let v1 = eval mem env e1 in
+      let v2 = eval mem env e2 in
+      let n2 = value_int (fst v2) in
+      if n2 = 0 then raise (Error "Division by zero")
+      else (Num (value_int (fst v1) / n2), mem)
+    | EQUAL (e1, e2) -> 
+      let v1 =  eval mem env e1 in
+      let v2 = eval mem env e2 in
+      (Bool (value_int (fst v1) = value_int (fst v2)), mem)
+    | LESS (e1, e2) ->
+      let v1 = eval mem env e1 in
+      let v2 = eval mem env e2 in
+      (Bool (value_int (fst v1) < value_int (fst v2)), mem)
+    | NOT e -> 
+      let v = eval mem env e in
+      (Bool (not (value_bool (fst v))), mem)
+    | SEQ (e1, e2) -> 
+      let _, mem' = eval mem env e1 in
+      eval mem' env e2
+    | IF (e1, e2, e3) -> 
+      let v1 = eval mem env e1 in
+      if value_bool (fst v1) then eval mem env e2 else eval mem env e3
+    | WHILE (e1, e2) ->
+      let rec loop mem = 
+        let v1 = eval mem env e1 in
+        if value_bool (fst v1) then
+          let _, mem' = eval mem env e2 in
+          loop mem'
+        else (Bool false, mem)
+      in loop mem
+    | NUM n -> (Num n, mem)
+    | TRUE -> (Bool true, mem)
+    | FALSE -> (Bool false, mem)
+    | _ -> raise (Error "Not implemented")
 
   let run (mem, env, pgm) =
     let v, _ = eval mem env pgm in
