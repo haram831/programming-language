@@ -202,47 +202,51 @@ module K : KMINUS = struct
         let l = lookup_env_loc env x in
         (Mem.load mem l, mem)
     | ADD (e1, e2) -> 
-      let v1 = eval mem env e1 in
-      let v2 = eval mem env e2 in
-      (Num (value_int (fst v1) + value_int (fst v2)), mem)
+      let v1, mem1 = eval mem env e1 in
+      let v2, mem2 = eval mem1 env e2 in
+      (Num (value_int v1 + value_int v2), mem2)
     | SUB (e1, e2) ->
-      let v1 = eval mem env e1 in
-      let v2 = eval mem env e2 in
-      (Num (value_int (fst v1) - value_int (fst v2)), mem)
+      let v1, mem1 = eval mem env e1 in
+      let v2, mem2 = eval mem1 env e2 in
+      (Num (value_int v1 - value_int v2), mem2)
     | MUL (e1, e2) ->
-      let v1 = eval mem env e1 in
-      let v2 = eval mem env e2 in
-      (Num (value_int (fst v1) * value_int (fst v2)), mem)
+      let v1, mem1 = eval mem env e1 in
+      let v2, mem2 = eval mem1 env e2 in
+      (Num (value_int v1 * value_int v2), mem2)
     | DIV (e1, e2) ->
-      let v1 = eval mem env e1 in
-      let v2 = eval mem env e2 in
-      let n2 = value_int (fst v2) in
+      let v1, mem1 = eval mem env e1 in
+      let v2, mem2 = eval mem1 env e2 in
+      let n2 = value_int v2 in
       if n2 = 0 then raise (Error "Division by zero")
-      else (Num (value_int (fst v1) / n2), mem)
-    | EQUAL (e1, e2) -> 
-      let v1 =  eval mem env e1 in
-      let v2 = eval mem env e2 in
-      (Bool (value_int (fst v1) = value_int (fst v2)), mem)
+      else (Num (value_int v1 / n2), mem2)
+    | EQUAL (e1, e2) -> (
+      let v2, mem1 = eval mem env e2 in
+      let v1, mem2 = eval mem1 env e1 in
+      match (v1, v2) with
+      | (Num n1, Num n2) -> (Bool (n1 = n2), mem2)
+      | (Bool b1, Bool b2) -> (Bool (b1 = b2), mem2)
+      | _ -> raise (Error "TypeError : cannot compare different types")
+    )
     | LESS (e1, e2) ->
-      let v1 = eval mem env e1 in
-      let v2 = eval mem env e2 in
-      (Bool (value_int (fst v1) < value_int (fst v2)), mem)
+      let v2, mem1 = eval mem env e2 in
+      let v1, mem2 = eval mem1 env e1 in
+      (Bool (value_int v1 < value_int v2), mem2)
     | NOT e -> 
-      let v = eval mem env e in
-      (Bool (not (value_bool (fst v))), mem)
+      let v, mem' = eval mem env e in
+      (Bool (not (value_bool v)), mem')
     | SEQ (e1, e2) -> 
       let _, mem' = eval mem env e1 in
       eval mem' env e2
     | IF (e1, e2, e3) -> 
-      let v1 = eval mem env e1 in
-      if value_bool (fst v1) then eval mem env e2 else eval mem env e3
+      let v1, mem1 = eval mem env e1 in
+      if value_bool v1 then eval mem1 env e2 else eval mem1 env e3
     | WHILE (e1, e2) ->
       let rec loop mem = 
-        let v1 = eval mem env e1 in
-        if value_bool (fst v1) then
-          let _, mem' = eval mem env e2 in
-          loop mem'
-        else (Bool false, mem)
+        let v1, mem1 = eval mem env e1 in
+        if value_bool v1 then
+          let _, mem2 = eval mem1 env e2 in
+          loop mem2
+        else (Bool false, mem1)
       in loop mem
     | NUM n -> (Num n, mem)
     | TRUE -> (Bool true, mem)
