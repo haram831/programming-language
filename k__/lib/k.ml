@@ -202,20 +202,20 @@ module K : KMINUS = struct
         let l = lookup_env_loc env x in
         (Mem.load mem l, mem)
     | ADD (e1, e2) -> 
-      let v1, mem1 = eval mem env e1 in
-      let v2, mem2 = eval mem1 env e2 in
+      let v2, mem1 = eval mem env e2 in
+      let v1, mem2 = eval mem1 env e1 in
       (Num (value_int v1 + value_int v2), mem2)
     | SUB (e1, e2) ->
-      let v1, mem1 = eval mem env e1 in
-      let v2, mem2 = eval mem1 env e2 in
+      let v2, mem1 = eval mem env e2 in
+      let v1, mem2 = eval mem1 env e1 in
       (Num (value_int v1 - value_int v2), mem2)
     | MUL (e1, e2) ->
-      let v1, mem1 = eval mem env e1 in
-      let v2, mem2 = eval mem1 env e2 in
+      let v2, mem1 = eval mem env e2 in
+      let v1, mem2 = eval mem1 env e1 in
       (Num (value_int v1 * value_int v2), mem2)
     | DIV (e1, e2) ->
-      let v1, mem1 = eval mem env e1 in
-      let v2, mem2 = eval mem1 env e2 in
+      let v2, mem1 = eval mem env e2 in
+      let v1, mem2 = eval mem1 env e1 in
       let n2 = value_int v2 in
       if n2 = 0 then raise (Error "Division by zero")
       else (Num (value_int v1 / n2), mem2)
