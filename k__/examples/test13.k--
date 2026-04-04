@@ -1,0 +1,11 @@
+(* Custom test case 13 : DIV evaluation order *)
+
+let x := 2 in
+write (x := 8) / x
+
+(* e2 먼저면:
+   x -> 2
+   x := 8 -> 8
+   8 / 2 = 4 *)
+
+(* Output : prints out "4\n" *)

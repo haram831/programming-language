@@ -1,0 +1,11 @@
+(* Custom test case 12 : SUB evaluation order *)
+
+let x := 0 in
+write (x := 5) - x
+
+(* e2 먼저면:
+   x -> 0
+   x := 5 -> 5
+   5 - 0 = 5 *)
+
+(* Output : prints out "5\n" *)

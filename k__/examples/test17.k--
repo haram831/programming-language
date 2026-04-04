@@ -1,0 +1,8 @@
+(* Custom test case 17 : WHILE loop *)
+
+let x := 0 in
+while x < 3 do
+  x := x + 1;
+write x
+
+(* Output : prints out "3\n" *)

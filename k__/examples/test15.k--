@@ -1,0 +1,11 @@
+(* Custom test case 15 : LESS evaluation order *)
+
+let x := 0 in
+if x < (x := 1) then write 10 else write 20
+
+(* e2 먼저면:
+   x := 1 -> 1
+   x -> 1
+   1 < 1 -> false *)
+
+(* Output : prints out "20\n" *)

@@ -1,0 +1,7 @@
+(* Custom test case 14 : SEQ memory threading *)
+
+let x := 0 in
+(x := 10);
+write x
+
+(* Output : prints out "10\n" *)

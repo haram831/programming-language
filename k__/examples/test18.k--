@@ -1,0 +1,8 @@
+(* Custom test case 18 : WHILE condition side effect *)
+
+let x := 0 in
+while (x := 1) < 0 do
+  x := 999;
+write x
+
+(* Output : prints out "1\n" *)

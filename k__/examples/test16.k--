@@ -1,0 +1,6 @@
+(* Custom test case 16 : IF condition side effect *)
+
+let x := 0 in
+if (x := 1) = 1 then write x else write 0
+
+(* Output : prints out "1\n" *)
