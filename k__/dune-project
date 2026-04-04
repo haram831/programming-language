@@ -1,0 +1,36 @@
+(lang dune 3.14)
+(using menhir 2.1)
+
+(name k__)
+
+(generate_opam_files true)
+
+(authors
+  "안중원 <jwahn@ropas.snu.ac.kr>"
+  "이재호 <jhlee@ropas.snu.ac.kr>"
+  "김세훈 <shkim@ropas.snu.ac.kr>"
+  "배요한 <yhbae@ropas.snu.ac.kr>"
+  "이동권 <dklee@ropas.snu.ac.kr>"
+  "최재승 <jschoi@ropas.snu.ac.kr>"
+  "강동옥 <dokang@ropas.snu.ac.kr>"
+  "최준원 <jwchoi@ropas.snu.ac.kr>"
+  "김진영 <jykim@ropas.snu.ac.kr>"
+  "윤용호 <yhyoon@ropas.snu.ac.kr>"
+  "장수원 <swjang@ropas.snu.ac.kr>"
+  "조성근 <skcho@ropas.snu.ac.kr>"
+  "김희정 <hjkim@ropas.snu.ac.kr>"
+  "허기홍 <khheo@ropas.snu.ac.kr>"
+  "최원태 <wtchoi@ropas.snu.ac.kr>"
+  "이희종 <ihji@ropas.snu.ac.kr>"
+  "오학주 <pronto@ropas.snu.ac.kr>"
+  "김덕환 <dk@ropas.snu.ac.kr>"
+  "신재호 <netj@ropas.snu.ac.kr>"
+  "최웅식 <wschoi@ropas.kaist.ac.kr>")
+
+(maintainers "안중원 <jwahn@ropas.snu.ac.kr>")
+
+(package
+ (name k__)
+ (synopsis "K-- interpreter")
+ (description "K-- interpreter")
+ (depends ocaml dune menhir))
