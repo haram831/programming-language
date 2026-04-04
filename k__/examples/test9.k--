@@ -8,4 +8,4 @@ else
   write 20;
 write 30
 
-(* Output : prints out "10/n" *)
+(* Output : prints out "10/n30/n" *)
