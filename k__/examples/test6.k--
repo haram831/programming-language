@@ -1,0 +1,7 @@
+(* Custom test case 6 : Mult before Add*)
+
+let x := 1 in
+let y := 2 in
+write x + y * 3
+
+(* Output : prints out "7\n" *)

@@ -1,0 +1,8 @@
+(* Custom test case 10 : While with sequence body *)
+
+let x := 0 in
+while x < 4 do
+  (x := x + 1;
+  write x)
+
+(* Output : prints out "1/n2/n" *)

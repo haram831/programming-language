@@ -1,0 +1,8 @@
+(* Custom test case 8 : Assignment precedence with arithmetic *)
+
+let x := 0 in
+(read x;
+ x := x * 2 + 1;
+ write x)
+
+(* Output : Reads in n and output n*2 + 1*)

@@ -1,0 +1,9 @@
+(* Custom test case 7 : Left-assoc subtraction *)
+
+let x := 1 in
+let y := 2 in
+let z := 3 in
+write x - y - z;
+write x - (y - z)
+
+(* Output : prints out "-4\n2/n" *)

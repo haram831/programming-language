@@ -1,0 +1,12 @@
+lib: [
+  "_build/install/default/lib/k__/META"
+  "_build/install/default/lib/k__/dune-package"
+  "_build/install/default/lib/k__/opam"
+]
+bin: [
+  "_build/install/default/bin/k__"
+]
+doc: [
+  "_build/install/default/doc/k__/README.md"
+  "_build/install/default/doc/k__/README.md:Zone.Identifier"
+]

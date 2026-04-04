@@ -1,0 +1,10 @@
+(* Custom test case 9 : Comparison and if *)
+
+let a := 1 in
+let b := 2 in
+if a + b * 3 = 7 then
+  write 10
+else
+  write 20
+
+(* Output : prints out "10/n" *)
