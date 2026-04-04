@@ -5,6 +5,7 @@ let b := 2 in
 if a + b * 3 = 7 then
   write 10
 else
-  write 20
+  write 20;
+write 30
 
 (* Output : prints out "10/n" *)
