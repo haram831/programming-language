@@ -1,0 +1,5 @@
+(* Custom test case 19 : EQUAL between int and bool returns false *)
+
+if 1 = true then write 10 else write 20
+
+(* Expected output : prints out "20\n" *)

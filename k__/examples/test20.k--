@@ -1,0 +1,5 @@
+(* Custom test case 20 dune exec --release k__ examples/test19.k--: EQUAL between bool and int returns false *)
+
+if false = 0 then write 10 else write 20
+
+(* Expected output : prints out "20\n" *)

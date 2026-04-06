@@ -1,0 +1,6 @@
+(* Custom test case 21 : EQUAL between int and bool with assignment side effect *)
+
+let x := 0 in
+if x = true then write 10 else write 20
+
+(* Expected output : prints out "20\n" *)
