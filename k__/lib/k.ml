@@ -222,10 +222,7 @@ module K : KMINUS = struct
     | EQUAL (e1, e2) -> (
       let v2, mem1 = eval mem env e2 in
       let v1, mem2 = eval mem1 env e1 in
-      match (v1, v2) with
-      | (Num n1, Num n2) -> (Bool (n1 = n2), mem2)
-      | (Bool b1, Bool b2) -> (Bool (b1 = b2), mem2)
-      | _ -> raise (Error "TypeError : cannot compare different types")
+      (Bool (v1 = v2), mem2)
     )
     | LESS (e1, e2) ->
       let v2, mem1 = eval mem env e2 in
@@ -251,7 +248,6 @@ module K : KMINUS = struct
     | NUM n -> (Num n, mem)
     | TRUE -> (Bool true, mem)
     | FALSE -> (Bool false, mem)
-    | _ -> raise (Error "Not implemented")
 
   let run (mem, env, pgm) =
     let v, _ = eval mem env pgm in
